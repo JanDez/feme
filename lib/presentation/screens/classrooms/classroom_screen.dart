@@ -1,4 +1,3 @@
-import 'package:feme/presentation/widgets/navbar/app_nav.dart';
 import 'package:flutter/material.dart';
 
 class ClassroomScreen extends StatefulWidget {
@@ -13,7 +12,7 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      bottomNavigationBar: AppNav(),
+      // bottomNavigationBar: AppNav(),
       body: Text('22222222222222222'),
     );
   }

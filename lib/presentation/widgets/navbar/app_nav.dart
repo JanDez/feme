@@ -1,84 +1,91 @@
-import 'package:feme/presentation/screens/screens.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-class AppNav extends StatefulWidget {
-  const AppNav({super.key});
+class PersistentBottomBarScaffold extends StatefulWidget {
+  /// pass the required items for the tabs and BottomNavigationBar
+  final List<PersistentTabItem> items;
+
+  const PersistentBottomBarScaffold({Key? key, required this.items})
+      : super(key: key);
 
   @override
-  State<AppNav> createState() => _AppNavState();
+  // ignore: library_private_types_in_public_api
+  _PersistentBottomBarScaffoldState createState() =>
+      _PersistentBottomBarScaffoldState();
 }
 
-class _AppNavState extends State<AppNav> {
-  late PersistentTabController _controller;
-
-  List<Widget> _buildScreens() {
-    return [
-      const HomeScreen(),
-      const ClassroomScreen(),
-      // const ReportScreen(),
-      // const ProfileScreen(),
-    ];
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home),
-        title: ("Home"),
-        activeColorPrimary: Colors.amber,
-        inactiveColorPrimary: Colors.greenAccent,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.system_update_tv_sharp),
-        title: ("Settings"),
-        activeColorPrimary: Colors.amber,
-        inactiveColorPrimary: Colors.greenAccent,
-      ),
-    ];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
+class _PersistentBottomBarScaffoldState
+    extends State<PersistentBottomBarScaffold> {
+  int _selectedTab = 0;
 
   @override
   Widget build(BuildContext context) {
-    _controller = PersistentTabController(initialIndex: 0);
+    return WillPopScope(
+      onWillPop: () async {
+        /// Check if curent tab can be popped
+        if (widget.items[_selectedTab].navigatorkey?.currentState?.canPop() ??
+            false) {
+          widget.items[_selectedTab].navigatorkey?.currentState?.pop();
+          return false;
+        } else {
+          // if current tab can't be popped then use the root navigator
+          return true;
+        }
+      },
+      child: Scaffold(
+        /// Using indexedStack to maintain the order of the tabs and the state of the
+        /// previously opened tab
+        body: IndexedStack(
+          index: _selectedTab,
+          children: widget.items
+              .map((page) => Navigator(
+                    /// Each tab is wrapped in a Navigator so that naigation in
+                    /// one tab can be independent of the other tabs
+                    key: page.navigatorkey,
+                    onGenerateInitialRoutes: (navigator, initialRoute) {
+                      return [
+                        MaterialPageRoute(builder: (context) => page.tab)
+                      ];
+                    },
+                  ))
+              .toList(),
+        ),
 
-    return PersistentTabView(
-      context,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: Colors.white, // Default is Colors.white.
-      handleAndroidBackButtonPress: true, // Default is true.
-      resizeToAvoidBottomInset:
-          true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
-      stateManagement: true, // Default is true.
-      hideNavigationBarWhenKeyboardShows:
-          true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
+        /// Define the persistent bottom bar
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _selectedTab,
+          onTap: (index) {
+            if (index == _selectedTab) {
+              widget.items[index].navigatorkey?.currentState
+                  ?.popUntil((route) => route.isFirst);
+            } else {
+              setState(() {
+                _selectedTab = index;
+              });
+            }
+          },
+          selectedItemColor: const Color(0xFF262C9C),
+          unselectedItemColor: Colors.black45,
+          items: widget.items
+              .map((item) => BottomNavigationBarItem(
+                  icon: Icon(item.icon), label: item.title))
+              .toList(),
+        ),
       ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: const ItemAnimationProperties(
-        // Navigation Bar's items animation properties.
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
-      ),
-      screenTransitionAnimation: const ScreenTransitionAnimation(
-        // Screen transition animation on change of selected tab.
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
-      ),
-      navBarStyle:
-          NavBarStyle.style1, // Choose the nav bar style with this property.
     );
   }
+}
+
+/// Model class that holds the tab info for the [PersistentBottomBarScaffold]
+class PersistentTabItem {
+  final Widget tab;
+  final GlobalKey<NavigatorState>? navigatorkey;
+  final String title;
+  final IconData icon;
+
+  PersistentTabItem(
+      {required this.tab,
+      this.navigatorkey,
+      required this.title,
+      required this.icon});
 }

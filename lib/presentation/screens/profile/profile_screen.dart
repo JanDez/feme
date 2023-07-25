@@ -1,4 +1,3 @@
-import 'package:feme/presentation/widgets/navbar/app_nav.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      bottomNavigationBar: AppNav(),
+      // bottomNavigationBar: AppNav(),
       body: Text('1111111111111111111'),
     );
   }

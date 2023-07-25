@@ -8,9 +8,7 @@ final appRouter = GoRouter(
         path: '/',
         builder: (context, state) => const LoginScreen()),
     GoRoute(
-        name: HomeScreen.name,
-        path: '/home',
-        builder: (context, state) => const HomeScreen()),
+        name: 'home', path: '/home', builder: (context, state) => HomePage()),
     GoRoute(
         name: ProfileScreen.name,
         path: '/profile',

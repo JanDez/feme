@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 import 'dart:convert';
 
-import 'package:feme/presentation/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart';
@@ -173,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: TextButton(
                 onPressed: () {
-                  context.pushNamed(HomeScreen.name);
+                  context.pushNamed('home');
                 },
                 child: const Text(
                   'Entrar',
